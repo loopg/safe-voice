@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "safe-voice"
+version = "0.1.0"
+description = "Layered prompt-injection defense for LLM voice & text agents — regex + normalization + optional ML + translation guard."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{ name = "safe-voice contributors" }]
+keywords = [
+    "llm", "prompt-injection", "security", "guardrails", "voice-agent",
+    "jailbreak", "ai-safety", "content-moderation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Typing :: Typed",
+]
+
+# Core has ZERO heavy dependencies — pure stdlib (re, urllib, asyncio, logging).
+# The ML scanner and translation scoring live behind optional extras.
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/safe-voice/safe-voice"
+Repository = "https://github.com/safe-voice/safe-voice"
+Issues = "https://github.com/safe-voice/safe-voice/issues"
+Changelog = "https://github.com/safe-voice/safe-voice/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+# ML injection scanner (protectai/deberta-v3-base-prompt-injection-v2).
+ml = [
+    "transformers>=4.40",
+    "torch>=2.2",
+]
+# Everything, for local development.
+dev = [
+    "safe-voice[ml]",
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "build>=1.2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/safevoice"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/safevoice", "README.md", "LICENSE", "NOTICE", "CHANGELOG.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["error::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+ignore = ["E501"]  # long regex/URL lines are intentional in patterns.py
+
+[tool.ruff.lint.per-file-ignores]
+# The Devanagari romanizer is a compact character-by-character state machine;
+# the dense one-line branches read more clearly than expanded blocks.
+"src/safevoice/normalize.py" = ["E701", "E702"]
+
+[tool.mypy]
+python_version = "3.10"
+packages = ["safevoice"]
+mypy_path = "src"
+warn_unused_ignores = true
+no_implicit_optional = true
+ignore_missing_imports = true
