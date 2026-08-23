@@ -155,9 +155,9 @@ set_audit_sink(lambda level, record: metrics.emit(record))   # route audit event
 ## Limitations
 
 `safe-voice` reduces risk; it is not a guarantee. The ML model is English-centric
-(hence the translation layer), novel attacks may pass, and thresholds are a
+(hence the translation layer), novel attacks may still pass, and thresholds are a
 precision/recall trade-off you should tune on your own traffic. Combine it with
-least-privilege tool design and output validation. See
+least-privilege tool design and output validation. See for more information
 [`docs/threat-model.md`](docs/threat-model.md).
 
 ## Examples
